@@ -91,4 +91,14 @@ func main() {
 
 
 if __name__ == '__main__':
-    init_go_project("test")
+    import sys
+
+    usage = f"{sys.argv[0]} <project-name>"
+
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("project_name")
+
+    args = parser.parse_args()
+
+    init_go_project(args.project_name)
