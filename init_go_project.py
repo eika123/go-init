@@ -17,22 +17,32 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-class PrintLogger:
+class PrettyPrinter:
     
-    def logOK(self, msg):
+    @staticmethod
+    def printOK(msg):
          print(bcolors.OKGREEN + "[OK]:" + bcolors.ENDC + " " + msg)
     
-    def logWARN(self, msg):
+    @staticmethod
+    def printWARN(msg):
          print(bcolors.WARNING + "[WARNING]:" + bcolors.ENDC + " " + msg)
     
-    def logFAIL(self, msg):
+    @staticmethod
+    def printFAIL(msg):
          print(bcolors.FAIL + bcolors.BOLD + "[FAIL]:" + bcolors.ENDC + " " + msg)
-    
+
+
+def makedir(path: Path):
+    try:
+        os.makedirs(path)
+        PrettyPrinter.printOK(f"Successfully created folder {path}")
+    except FileExistsError:
+        PrettyPrinter.printFAIL(f"One or more directories in '{path}' already exists")
+        raise
+
 
 def init_go_project(project_name):
     """ initialize a go project with name <name> in the current working directory """
-
-    logger = PrintLogger()
 
     # get the current directory
     current_dir = Path(os.getcwd())
@@ -41,31 +51,12 @@ def init_go_project(project_name):
     cmd_hello_dir = Path.joinpath(cmd_dir, "hello")
     cmd_hello_main = Path.joinpath(cmd_hello_dir, "main.go")
 
-
     internal_dir = Path.joinpath(current_dir, "internal")
     pkg_dir = Path(current_dir, "pkg")
 
-
-    try:
-        os.makedirs(cmd_hello_dir)
-        logger.logOK(f"Successfully created folder {cmd_hello_dir}")
-    except FileExistsError:
-            logger.logFAIL(f"One or more directories in '{cmd_hello_dir}' already exists")
-            raise
-
-    try:
-        os.mkdir(internal_dir)
-        logger.logOK(f"Successfully created folder {internal_dir}")
-    except FileExistsError:
-            logger.logFAIL(f"One or more directories in '{internal_dir}' already exists")
-            raise
-    
-    try:
-        os.mkdir(pkg_dir)
-        logger.logOK(f"Successfully created folder {pkg_dir}")
-    except FileExistsError:
-            logger.logFAIL(f"One or more directories in '{pkg_dir}' already exists")
-
+    makedir(cmd_hello_dir)
+    makedir(internal_dir)
+    makedir(pkg_dir)
 
     hello_file = open(cmd_hello_main, "w")
     go_hello = """
@@ -87,9 +78,6 @@ func main() {
 
     # check if current directory contains cmd and pkg directories
     return
-
-
-
 
 if __name__ == '__main__':
     import sys
